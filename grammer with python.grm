@@ -1,0 +1,71 @@
+"Name"     = 'GoldParser Python Minimal Syntax'
+"Author"   = 'Reem Eldafrawy'
+"Version"  = '1.0'
+"About"    = 'Minimal syntax for required project: expressions, condition, loop'
+
+"Start Symbol" = <Program>
+
+! -----------------------------
+! Character Sets
+! -----------------------------
+
+{ID Head}      = {Letter} + [_]
+{ID Tail}      = {Alphanumeric} + [_]
+{String Chars} = {Printable} + {HT} - ["\]
+
+! -----------------------------
+! Terminals
+! -----------------------------
+
+Identifier    = {ID Head}{ID Tail}*
+StringLiteral = '"' ( {String Chars} | '\' {Printable} )* '"'
+Integer       = {digit}+
+NewLine       = '\n'
+Indent        = 'INDENT'
+Dedent        = 'DEDENT'
+
+! -----------------------------
+! Rules
+! -----------------------------
+
+<Program> ::= <StatementList>
+
+<StatementList> ::= 
+               | <StatementList> <Statement>
+               | <Statement>
+
+<Statement> ::= <Assignment> 
+             | <IfStatement> 
+             | <WhileLoop>
+
+<Assignment> ::= Identifier '=' <Expression> NewLine
+
+<IfStatement> ::= 'if' <Expression> ':' NewLine Indent <StatementList> Dedent
+               | 'if' <Expression> ':' NewLine Indent <StatementList> Dedent 'else' ':' NewLine Indent <StatementList> Dedent
+
+<WhileLoop> ::= 'while' <Expression> ':' NewLine Indent <StatementList> Dedent
+
+<Expression>  ::= <Expression> '>'  <Add Exp> 
+               |  <Expression> '<'  <Add Exp> 
+               |  <Expression> '<=' <Add Exp> 
+               |  <Expression> '>=' <Add Exp>
+               |  <Expression> '==' <Add Exp>  
+               |  <Expression> '!=' <Add Exp>    
+               |  <Add Exp> 
+
+<Add Exp>     ::= <Add Exp> '+' <Mult Exp>
+               |  <Add Exp> '-' <Mult Exp>
+               |  <Mult Exp> 
+
+<Mult Exp>    ::= <Mult Exp> '*' <Negate Exp> 
+               |  <Mult Exp> '/' <Negate Exp> 
+               |  <Negate Exp> 
+
+<Negate Exp>  ::= '-' <Value> 
+               |  <Value> 
+
+<Value>       ::= Identifier
+               | Integer
+               | StringLiteral
+               | '(' <Expression> ')'
+
